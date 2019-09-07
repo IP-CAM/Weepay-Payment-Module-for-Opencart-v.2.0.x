@@ -48,7 +48,7 @@ class ModelPaymentWeepayPayment extends Model {
         curl_setopt($ch, CURLOPT_URL, 'http://api.kahvedigital.com/version');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, "opencart=$opencart&weepay=$weepayversion&type=opencart&domain=$serverdomain");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, "opencart=$opencart&weepay=$weepay&type=opencart&domain=$serverdomain");
         $response = curl_exec($ch);
         $response = json_decode($response, true);
         return $response;

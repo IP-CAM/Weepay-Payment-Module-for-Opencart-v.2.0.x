@@ -15,7 +15,7 @@ weepay opencart is the simple and lightweight implementation of [weepay.co](http
 
 ## Installation
 * Backup your webstore and database
-* Download the source [Opencart 2.0.x Last version releases](https://www.weepay.co), just copy all the files in the zip to your OpenCart directory.
+* Download the source [Opencart 2.0.x Last version releases](https://github.com/weepay/Opencart-2.0/releases/), just copy all the files in the zip to your OpenCart directory.
 * Click Extensions tab and Payments subtab in your OpenCart admin panel.
 * Find weepay extension and install the module. Then click Edit.
 * Get your api keys from weepay merchant [backend](https://www.pos.weepay.co/)
@@ -35,25 +35,8 @@ weepay opencart is the simple and lightweight implementation of [weepay.co](http
 
 If you found a repeatable bug, and troubleshooting tips didn't help, then be sure to [search existing issues](https://github.com/weepay/OpenCart/issues) first. Include steps to consistently reproduce the problem, actual vs. expected results, screenshots, and your OpenCart version and Payment module version number. Disable all extensions to verify the issue is a core bug.
 
-#### Editor.md directory
+#### Opencart-2.0. directory
 
-    editor.md/
-            lib/
-            css/
-            scss/
-            tests/
-            fonts/
-            images/
-            plugins/
-            examples/
-            languages/     
-            editormd.js
-            ...
-
-```html
-<!-- English -->
-<script src="../dist/js/languages/en.js"></script>
-
-<!-- 繁體中文 -->
-<script src="../dist/js/languages/zh-tw.js"></script>
-```
+   Opencart-2.0/
+            admin/
+            catalog/

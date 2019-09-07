@@ -143,6 +143,55 @@ class ControllerPaymentWeepayPayment extends Controller {
         $data['footer'] = $this->load->controller('common/footer');
         $this->response->setOutput($this->load->view('payment/weepay_payment.tpl', $data));
     }
+    
+    
+      public function update() {
+		
+		 
+           $this->load->model('payment/weepay_payment');
+           $this->load->language('payment/weepay_payment');
+           $version_updatable = $this->request->get['version'];
+           $updated = $this->model_payment_weepay_payment->update($version_updatable);
+           if ($updated == 1) {
+			$this->load->model('setting/setting');
+			$weepay_payment_bayiid=$this->config->get('weepay_payment_bayiid');
+			$weepay_payment_api=$this->config->get('weepay_payment_api');
+			$weepay_payment_secret=$this->config->get('weepay_payment_secret');	
+			$weepay_payment_status=$this->config->get('weepay_payment_status');	
+			$weepay_payment_form_type=$this->config->get('weepay_payment_form_type');	
+			$weepay_payment_cancel_order_status_id=$this->config->get('weepay_payment_cancel_order_status_id');
+			$weepay_payment_checkout_type=$this->config->get('weepay_payment_checkout_type');	
+			$weepay_payment_order_status_id=$this->config->get('weepay_payment_order_status_id');	
+			$weepay_payment_test_mode=$this->config->get('weepay_payment_test_mode');	
+			$weepay_payment_sort_order=$this->config->get('weepay_payment_sort_order');	
+			$weepay_payment_installement=$this->config->get('weepay_payment_installement');	
+		
+			$this->session->data['weepay_update'] =1;
+			$this->load->controller('payment/' . 'weepay_payment' . '/uninstall');
+			$this->load->controller('payment/' . 'weepay_payment' . '/install');
+			
+			$this->config->set('weepay_payment_bayiid', $weepay_payment_bayiid);
+			$this->config->set('weepay_payment_api', $weepay_payment_api);
+			$this->config->set('weepay_payment_secret', $weepay_payment_secret);
+			$this->config->set('weepay_payment_status', $weepay_payment_status);
+			$this->config->set('weepay_payment_test_mode', $weepay_payment_test_mode);
+			$this->config->set('weepay_payment_form_type', $weepay_payment_form_type);
+			$this->config->set('weepay_payment_checkout_type', $weepay_payment_checkout_type);
+			$this->config->set('weepay_payment_order_status_id', $weepay_payment_order_status_id);
+			$this->config->set('weepay_payment_sort_order', $weepay_payment_sort_order);
+			$this->config->set('weepay_payment_installement', $weepay_payment_installement);
+			$this->config->set('weepay_payment_cancel_order_status_id', $weepay_payment_cancel_order_status_id);
+
+		
+			unset($this->session->data['weepay_update']);
+			$this->load->controller('extension/modification/refresh');
+            $this->session->data['success'] = $this->language->get('text_success');
+            $this->response->redirect($this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'));
+            } else {
+            $this->response->redirect($this->url->link('payment/weepay_payment', 'token=' . $this->session->data['token'] . "&update_error=$updated", true));
+			}
+    }
+    
 
     public function install() {
         $this->load->model('payment/weepay_payment');

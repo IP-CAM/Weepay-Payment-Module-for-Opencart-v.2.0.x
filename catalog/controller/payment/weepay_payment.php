@@ -115,8 +115,8 @@ class ControllerPaymentWeepayPayment extends Controller {
 
     public function callback() {
         $server_conn_slug = $this->getServerConnectionSlug();
-        $this->load->language('payment/iyzico_checkout_form');
-        $this->load->model('payment/iyzico_checkout_form');
+        $this->load->language('payment/weepay_payment');
+        $this->load->model('payment/weepay_payment');
         $this->load->model('checkout/order');
         $postData = $this->request->post;
         try {

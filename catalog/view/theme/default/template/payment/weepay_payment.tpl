@@ -52,7 +52,7 @@
                             $('.weepay-form-content').append(json.CheckoutFormData);
 
                             $("#weePay-checkout-form").promise().done(function () {
-                                $('#loadingWeePay').css('display', 'none');
+                                $('#loadingWeePay').css('opacity') = '0';
                             });
 
                         });

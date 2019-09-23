@@ -108,9 +108,11 @@ class ControllerPaymentWeepayPayment extends Controller {
             }
         } catch (\Exception $exc) {
             $data['error'] = $exc->getMessage();
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($result));
         }
-        $this->response->addHeader('Content-Type: application/json');
-        $this->response->setOutput(json_encode($result));
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($result));
     }
 
     public function callback() {

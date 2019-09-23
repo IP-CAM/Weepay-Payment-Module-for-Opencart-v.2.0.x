@@ -66,14 +66,14 @@
 
                         $(".weepay_form_payment").show();
                         $('.weepay-form-content').append('<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">×</button>' + json.message + '</div>');
-
-
+                           $('#loadingWeePay').css("opacity", "0");
+                    
                     }
                 } else {
 
                     $(".weepay_form_payment").show();
                     $('.weepay-form-content').append('<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">×</button>Connection Error</div>');
-
+                    $('#loadingWeePay').css("opacity", "0");
                 }
             }
         });

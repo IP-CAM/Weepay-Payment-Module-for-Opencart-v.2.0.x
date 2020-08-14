@@ -1,13 +1,15 @@
 <?php
 
 error_reporting(0);
-class ControllerPaymentWeepayPayment extends Controller {
+class ControllerPaymentWeepayPayment extends Controller
+{
 
     private $valid_currency = array("TRY", "GBP", "USD", "EUR", "TL");
     private $order_prefix = "opencart20X_";
 
-    public function index() {
-        // 
+    public function index()
+    {
+        //
         $this->load->language('payment/weepay_payment');
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
@@ -28,9 +30,29 @@ class ControllerPaymentWeepayPayment extends Controller {
         }
         return $this->load->view($template_url, $data);
     }
+    private function setcookieSameSite($name, $value, $expire, $path, $domain, $secure, $httponly)
+    {
 
-    public function checkoutform() {
+        if (PHP_VERSION_ID < 70300) {
+
+            setcookie($name, $value, $expire, "$path; samesite=None", $domain, $secure, $httponly);
+        } else {
+            setcookie($name, $value, [
+                'expires' => $expire,
+                'path' => $path,
+                'domain' => $domain,
+                'samesite' => 'None',
+                'secure' => $secure,
+                'httponly' => $httponly,
+            ]);
+
+        }
+    }
+
+    public function checkoutform()
+    {
         try {
+            $setCookie = $this->setcookieSameSite("PHPSESSID", $_COOKIE['PHPSESSID'], time() + 86400, "/", $_SERVER['SERVER_NAME'], true, true);
             $data['checkout_form_content'] = '';
             $data['error'] = '';
             $data['form_class'] = $this->config->get('weepay_payment_form_type');
@@ -83,7 +105,7 @@ class ControllerPaymentWeepayPayment extends Controller {
                 $weepayArray['Aut'] = array(
                     'bayi-id' => $bayiid,
                     'api-key' => $api,
-                    'secret-key' => $secret
+                    'secret-key' => $secret,
                 );
                 $weepayArray['Data'] = array(
                     'CallBackUrl' => $callback_url,
@@ -96,7 +118,7 @@ class ControllerPaymentWeepayPayment extends Controller {
                     'OutSourceID' => $unique_conversation_id,
                     'Description' => !empty($order_info['payment_zone']) ? $order_info['payment_zone'] : "NOT",
                     'Currency' => $this->getCurrencyConstant($order_info['currency_code']),
-                    'Channel' => 'Module'
+                    'Channel' => 'Module',
                 );
                 $endPointUrl = "https://api.weepay.co/Payment/PaymentCheckoutFormCreate/";
                 $result = json_decode($this->curlPostExt(json_encode($weepayArray), $endPointUrl, true));
@@ -111,11 +133,12 @@ class ControllerPaymentWeepayPayment extends Controller {
             $this->response->addHeader('Content-Type: application/json');
             $this->response->setOutput(json_encode($result));
         }
-            $this->response->addHeader('Content-Type: application/json');
-            $this->response->setOutput(json_encode($result));
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($result));
     }
 
-    public function callback() {
+    public function callback()
+    {
         $server_conn_slug = $this->getServerConnectionSlug();
         $this->load->language('payment/weepay_payment');
         $this->load->model('payment/weepay_payment');
@@ -142,9 +165,9 @@ class ControllerPaymentWeepayPayment extends Controller {
                     $old_amount = str_replace(',', '', $order_info['total'] * $order_info['currency_value']);
                     $installment_fee_variation = ($new_amount - $old_amount) / $exchange_rate;
                     $this->db->query("INSERT INTO " . DB_PREFIX . "order_total SET order_id = '" .
-                            (int) $order_id . "',code = '" . $this->db->escape('weepay_installement_fee') .
-                            "',  title = '" . $this->db->escape('Taksit Komisyonu') . "' , `value` = '" .
-                            (float) $installment_fee_variation . "', sort_order = '" . (int) $last_sort_value . "'");
+                        (int) $order_id . "',code = '" . $this->db->escape('weepay_installement_fee') .
+                        "',  title = '" . $this->db->escape('Taksit Komisyonu') . "' , `value` = '" .
+                        (float) $installment_fee_variation . "', sort_order = '" . (int) $last_sort_value . "'");
                     $order_total_data = (array) $this->db->query("SELECT * FROM " . DB_PREFIX . "order_total WHERE order_id = '" . (int) $order_id . "' AND code != 'total' ");
                     $calculate_total = 0;
                     foreach ($order_total_data['rows'] as $row) {
@@ -155,8 +178,8 @@ class ControllerPaymentWeepayPayment extends Controller {
                     $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('weepay_payment_order_status_id'), $message, false);
                     $comment = ' - ' . $Result->Data->PaymentDetail->InstallmentNumber . '  Taksit';
                     $this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int) $order_id . "', order_status_id = '" .
-                            $this->config->get('weepay_payment_order_status_id') . "', notify = '0', comment = '" .
-                            $this->db->escape($comment) . "', date_added = NOW()");
+                        $this->config->get('weepay_payment_order_status_id') . "', notify = '0', comment = '" .
+                        $this->db->escape($comment) . "', date_added = NOW()");
                 } else {
                     $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('weepay_payment_order_status_id'), $message, false);
                 }
@@ -170,12 +193,15 @@ class ControllerPaymentWeepayPayment extends Controller {
         }
     }
 
-    private function curlPostExt($data, $url, $json = false) {
+    private function curlPostExt($data, $url, $json = false)
+    {
         $ch = curl_init(); // initialize curl handle
         curl_setopt($ch, CURLOPT_URL, $url); // set url to post to
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // return into a variable
-        if ($json)
+        if ($json) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        }
+
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30); // times out after 4s
@@ -187,7 +213,8 @@ class ControllerPaymentWeepayPayment extends Controller {
         }
     }
 
-    public function getSiteUrl() {
+    public function getSiteUrl()
+    {
         if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) {
             $site_url = is_null($this->config->get('config_ssl')) ? HTTPS_SERVER : $this->config->get('config_ssl');
         } else {
@@ -196,7 +223,8 @@ class ControllerPaymentWeepayPayment extends Controller {
         return $site_url;
     }
 
-    public function getServerConnectionSlug() {
+    public function getServerConnectionSlug()
+    {
         if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) {
             $connection = 'SSL';
         } else {
@@ -205,7 +233,8 @@ class ControllerPaymentWeepayPayment extends Controller {
         return $connection;
     }
 
-    private function _getCurrencySymbol($currencyCode) {
+    private function _getCurrencySymbol($currencyCode)
+    {
         $currencySymbol = $this->currency->getSymbolLeft($currencyCode);
         if ($currencySymbol == '') {
             $currencySymbol = $this->currency->getSymbolRight($currencyCode);
@@ -215,7 +244,8 @@ class ControllerPaymentWeepayPayment extends Controller {
         return $currencySymbol;
     }
 
-    function GetOrderData($id_order) {
+    public function GetOrderData($id_order)
+    {
         $bayiid = $this->config->get('weepay_payment_bayiid');
         $api = $this->config->get('weepay_payment_api');
         $secret = $this->config->get('weepay_payment_secret');
@@ -223,16 +253,17 @@ class ControllerPaymentWeepayPayment extends Controller {
         $weepayArray['Aut'] = array(
             'bayi-id' => $bayiid,
             'api-key' => $api,
-            'secret-key' => $secret
+            'secret-key' => $secret,
         );
         $weepayArray['Data'] = array(
-            'OrderID' => $id_order
+            'OrderID' => $id_order,
         );
         $weepayEndPoint = "https://api.weepay.co/Payment/GetPaymentDetail";
         return json_decode($this->curlPostExt(json_encode($weepayArray), $weepayEndPoint, true));
     }
 
-    public function replaceSpace($veri) {
+    public function replaceSpace($veri)
+    {
         $veri = str_replace("/s+/", "", $veri);
         $veri = str_replace(" ", "", $veri);
         $veri = str_replace(" ", "", $veri);
@@ -243,7 +274,8 @@ class ControllerPaymentWeepayPayment extends Controller {
         return $veri;
     }
 
-    private function getCurrencyConstant($currencyCode) {
+    private function getCurrencyConstant($currencyCode)
+    {
         $currency = 'TL';
         switch ($currencyCode) {
             case "TRY":
